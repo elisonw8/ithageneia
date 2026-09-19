@@ -466,8 +466,19 @@ function itemFix(){
   const o=SET.item,ok=itemUnits(o).every(u=>SET.res[u]||SET.ov[u]);
   if(IT.res[o.id]!==ok){IT.res[o.id]=ok;S.it[o.id].l=ok?1:0;save()}
 }
+window.audErr=function(a){
+  const e=a.parentNode.querySelector('.aerr');if(!e)return;e.style.display='block';
+  const u=a.src;let base=e.getAttribute('data-base');if(!base){base=e.innerHTML;e.setAttribute('data-base',base)}
+  const show=t=>{e.innerHTML=base+'<div style="margin-top:8px;font-size:.85em;word-break:break-all">'+t+'</div>'};
+  if(location.protocol==='file:'||location.protocol==='content:'){show('Η σελίδα ανοίχτηκε ως αρχείο και όχι από σύνδεσμο.');return}
+  fetch(u,{method:'HEAD',cache:'no-store'}).then(r=>{
+    if(r.status===404)show('Δεν βρέθηκε το αρχείο στη διεύθυνση:<br><b>'+esc(u)+'</b><br>Ο φάκελος <b>audio</b> με τα αρχεία or-01.mp3 … or-50.mp3 πρέπει να είναι ακριβώς δίπλα στο index.html.');
+    else if(r.ok)show('Το αρχείο υπάρχει ('+esc(u)+') αλλά το πρόγραμμα περιήγησης δεν μπόρεσε να το παίξει. Δοκίμασε επαναφόρτωση της σελίδας.');
+    else show('Σφάλμα '+r.status+' στη διεύθυνση:<br><b>'+esc(u)+'</b>');
+  }).catch(()=>show('Δεν υπάρχει σύνδεση με τη διεύθυνση:<br><b>'+esc(u)+'</b>'));
+};
 function audioHtml(q){
-  return `<div class="card aud"><b>Ακουστικό υλικό · Θέμα ${q.n}</b><audio controls preload="none" src="${esc(q.au)}" onerror="var e=this.parentNode.querySelector('.aerr');if(e)e.style.display='block'"></audio><div class="row" style="margin-top:8px"><button class="btn ghost" data-act="spd" data-v="0.8" style="min-height:36px;padding:6px 12px;flex:0 0 auto">Πιο αργά ×0.8</button><button class="btn ghost" data-act="spd" data-v="1" style="min-height:36px;padding:6px 12px;flex:0 0 auto">Κανονικά ×1</button></div><div class="banner aerr" style="display:none;margin:10px 0 0">Το ηχητικό δεν φορτώθηκε. Χρειάζεται σύνδεση στο internet και άνοιγμα από τον σύνδεσμο της εφαρμογής (όχι από ένα αντίγραφο του αρχείου στο κινητό).</div></div><div style="height:14px"></div>`;
+  return `<div class="card aud"><b>Ακουστικό υλικό · Θέμα ${q.n}</b><audio controls preload="none" src="${esc(q.au)}" onerror="audErr(this)"></audio><div class="row" style="margin-top:8px"><button class="btn ghost" data-act="spd" data-v="0.8" style="min-height:36px;padding:6px 12px;flex:0 0 auto">Πιο αργά ×0.8</button><button class="btn ghost" data-act="spd" data-v="1" style="min-height:36px;padding:6px 12px;flex:0 0 auto">Κανονικά ×1</button></div><div class="banner aerr" style="display:none;margin:10px 0 0">Το ηχητικό δεν φορτώθηκε. Χρειάζεται σύνδεση στο internet και άνοιγμα από τον σύνδεσμο της εφαρμογής (όχι από ένα αντίγραφο του αρχείου στο κινητό).</div></div><div style="height:14px"></div>`;
 }
 function ansText(b){
   if(b.k==='mcq')return b.o[b.a];
